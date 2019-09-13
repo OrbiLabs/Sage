@@ -29,7 +29,7 @@ public enum Variant {
     case upsideDown
 
     /// Standard regardless of Swift version.
-    internal static let _standard = Variant.standard
+    public static let _standard = Variant.standard
 
     /// UpsideDown regardless of Swift version.
     internal static let _upsideDown = Variant.upsideDown

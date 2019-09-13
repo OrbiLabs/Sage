@@ -29,7 +29,7 @@ public enum Color: String, CustomStringConvertible {
     case black
 
     /// White color regardless of Swift version.
-    internal static let _white = Color.white
+    public static let _white = Color.white
 
     /// Black color regardless of Swift version.
     internal static let _black = Color.black

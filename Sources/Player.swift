@@ -32,7 +32,7 @@ public struct Player: Equatable, CustomStringConvertible {
         case computer = "Computer"
 
         /// Human regardless of Swift version.
-        internal static let _human = Kind.human
+        public static let _human = Kind.human
 
         /// Computer regardless of Swift version.
         internal static let _computer = Kind.computer

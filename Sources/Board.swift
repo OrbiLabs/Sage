@@ -271,7 +271,7 @@ public struct Board: Hashable, CustomStringConvertible {
 
     /// The board's pieces.
     public var pieces: [Piece] {
-        return self.flatMap({ $0.piece })
+        return self.compactMap({ $0.piece })
     }
 
     /// The board's white pieces.
@@ -564,10 +564,10 @@ public struct Board: Hashable, CustomStringConvertible {
         let opRQ = bitboard(for: Piece(rook: color.inverse()))   | bitboard(for: Piece(queen: color.inverse()))
         let opBQ = bitboard(for: Piece(bishop: color.inverse())) | bitboard(for: Piece(queen: color.inverse()))
         for square in king._xrayRookAttacks(occupied: occupied, stoppers: pieces) & opRQ {
-            pinned |= square.between(kingSquare) & pieces
+            pinned = Bitboard(rawValue: pinned.rawValue | Bitboard(rawValue: square.between(kingSquare).rawValue & pieces.rawValue).rawValue)
         }
         for square in king._xrayBishopAttacks(occupied: occupied, stoppers: pieces) & opBQ {
-            pinned |= square.between(kingSquare) & pieces
+            pinned = Bitboard(rawValue: pinned.rawValue | Bitboard(rawValue: square.between(kingSquare).rawValue & pieces.rawValue).rawValue)
         }
         return pinned
     }

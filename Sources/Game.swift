@@ -602,7 +602,7 @@ public final class Game {
 
     /// Returns the captured pieces for a color, or for all if color is `nil`.
     public func capturedPieces(for color: Color? = nil) -> [Piece] {
-        let pieces = _moveHistory.flatMap({ $0.capture })
+        let pieces = _moveHistory.compactMap({ $0.capture })
         if let color = color {
             return pieces.filter({ $0.color == color })
         } else {
@@ -639,11 +639,12 @@ public final class Game {
             let doublePushes = (squareBitboard & Bitboard(startFor: piece))
                 ._pawnPushes(for: playerTurn, empty: emptyBitboard)
                 ._pawnPushes(for: playerTurn, empty: emptyBitboard)
-            movesBitboard |= pushes | doublePushes
-                | (attacks & enemyBitboard)
-                | (attacks & enPassant)
+			let otherMoves = Bitboard(rawValue: pushes.rawValue | doublePushes.rawValue
+				| (attacks.rawValue & enemyBitboard.rawValue)
+				| (attacks.rawValue & enPassant.rawValue))
+			movesBitboard = Bitboard(rawValue: movesBitboard.rawValue | otherMoves.rawValue)
         } else {
-            movesBitboard |= attacks & ~playerBitboard
+            movesBitboard = Bitboard(rawValue: movesBitboard.rawValue | (attacks.rawValue & ~playerBitboard.rawValue))
         }
 
         if piece.kind.isKing && squareBitboard == Bitboard(startFor: piece) && !kingIsChecked {
@@ -657,7 +658,7 @@ public final class Game {
                         continue rightLoop
                     }
                 }
-                movesBitboard |= Bitboard(square: right.castleSquare)
+                movesBitboard = Bitboard(rawValue: movesBitboard.rawValue | Bitboard(square: right.castleSquare).rawValue)
             }
         }
 

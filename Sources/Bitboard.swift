@@ -611,7 +611,7 @@ public struct Bitboard: RawRepresentable, Hashable, CustomStringConvertible {
         let empty = ~stoppers
         var bitboard = self
         for _ in 0 ..< 7 {
-            bitboard |= empty & bitboard.shifted(toward: direction)
+            bitboard = Bitboard(rawValue: bitboard.rawValue | (empty.rawValue & bitboard.shifted(toward: direction).rawValue))
         }
         return bitboard
     }
@@ -722,7 +722,7 @@ public struct Bitboard: RawRepresentable, Hashable, CustomStringConvertible {
 
 #if swift(>=3)
 
-extension Bitboard: Sequence, BitwiseOperations {
+extension Bitboard: Sequence {
 
     /// A value less than or equal to the number of elements in
     /// the sequence, calculated nondestructively.
