@@ -286,7 +286,7 @@ public final class Game {
         ///            [FEN (Chess Programming Wiki)](https://chessprogramming.wikispaces.com/Forsyth-Edwards+Notation)
         public func fen() -> String {
             #if swift(>=3)
-                let transform = { "\($0 as Square)".lowercased() }
+                let transform : (Square)->(String) = { "\($0 as Square)".lowercased() }
             #else
                 let transform = { "\($0 as Square)".lowercaseString }
             #endif
