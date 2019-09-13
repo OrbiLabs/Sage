@@ -97,7 +97,7 @@ public final class Game {
         /// Create an outcome from `string`. Ignores whitespace.
         public init?(_ string: String) {
             #if swift(>=3)
-                let stripped = string.characters.split(separator: " ").map(String.init).joined(separator: "")
+                let stripped = string.split(separator: " ").map(String.init).joined(separator: "")
             #else
                 let stripped = string.characters.split(" ").map(String.init).joinWithSeparator("")
             #endif
@@ -167,12 +167,12 @@ public final class Game {
         ///            [FEN (Chess Programming Wiki)](https://chessprogramming.wikispaces.com/Forsyth-Edwards+Notation)
         public init?(fen: String) {
             #if swift(>=3)
-                let parts = fen.characters.split(separator: " ").map(String.init)
+                let parts = fen.split(separator: " ").map(String.init)
                 guard
                     parts.count == 6,
                     let board = Board(fen: parts[0]),
-                    parts[1].characters.count == 1,
-                    let playerTurn = parts[1].characters.first.flatMap(Color.init),
+                    parts[1].count == 1,
+                    let playerTurn = parts[1].first.flatMap(Color.init),
                     let rights = CastlingRights(string: parts[2]),
                     let halfmoves = UInt(parts[4]),
                     let fullmoves = UInt(parts[5]),
@@ -195,7 +195,7 @@ public final class Game {
             #endif
             var target: Square? = nil
             let targetStr = parts[3]
-            let targetChars = targetStr.characters
+            let targetChars = targetStr
             if targetChars.count == 2 {
                 guard let square = Square(targetStr) else {
                     return nil

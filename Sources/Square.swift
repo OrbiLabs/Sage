@@ -482,7 +482,7 @@ extension Square {
 
     /// Create a square from `string`.
     public init?(_ string: String) {
-        let chars = string.characters
+        let chars = string
         guard chars.count == 2 else {
             return nil
         }

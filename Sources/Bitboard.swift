@@ -231,7 +231,7 @@ public struct Bitboard: RawRepresentable, Hashable, CustomStringConvertible {
     public var description: String {
         let num = String(rawValue, radix: 16)
         #if swift(>=3)
-            let str = repeatElement("0", count: 16 - num.characters.count).joined(separator: "")
+            let str = repeatElement("0", count: 16 - num.count).joined(separator: "")
         #else
             let str = Repeat(count: 16 - num.characters.count, repeatedValue: "0").joinWithSeparator("")
         #endif

@@ -366,11 +366,11 @@ public struct PGN: Equatable {
         self.init()
         if string.isEmpty { return }
         for line in string._splitByNewlines() {
-            if line.characters.first == "[" {
+            if line.first == "[" {
                 let commentsStripped = try line._commentsStripped(strings: true)
                 let (tag, value) = try commentsStripped._tagPair()
                 tagPairs[tag] = value
-            } else if line.characters.first != "%" {
+            } else if line.first != "%" {
                 let commentsStripped = try line._commentsStripped(strings: false)
                 let (moves, outcome) = try commentsStripped._moves()
                 self.moves += moves
@@ -425,7 +425,7 @@ public struct PGN: Equatable {
             if num + 1 < moves.endIndex {
                 moveString += " \(moves[num + 1])"
             }
-            if moveString.characters.count + moveLine.characters.count < 80 {
+            if moveString.count + moveLine.count < 80 {
                 if !moveLine.isEmpty {
                     moveString = " \(moveString)"
                 }
@@ -441,7 +441,7 @@ public struct PGN: Equatable {
         if let outcomeString = outcome?.description {
             if moveLine.isEmpty {
                 result += "\n\(outcomeString)"
-            } else if outcomeString.characters.count + moveLine.characters.count < 80 {
+            } else if outcomeString.count + moveLine.count < 80 {
                 result += " \(outcomeString)"
             } else {
                 result += "\n\(outcomeString)"
@@ -483,7 +483,7 @@ private extension String {
     @inline(__always)
     func _split(by set: Set<Character>) -> [String] {
         #if swift(>=3)
-            return characters.split(whereSeparator: set.contains).map(String.init)
+            return self.split(whereSeparator: set.contains).map(String.init)
         #else
             return characters.split(isSeparator: set.contains).map(String.init)
         #endif
@@ -501,7 +501,7 @@ private extension String {
 
     @inline(__always)
     func _tagPair() throws -> (String, String) {
-        guard characters.last == "]" else {
+        guard self.last == "]" else {
             #if swift(>=3)
                 throw PGN.ParseError.noClosingBracket(self)
             #else
@@ -540,7 +540,7 @@ private extension String {
         var ravDepth = 0
         var startIndex = self.startIndex
         let lastIndex = _lastIndex
-        for (index, character) in zip(characters.indices, characters) {
+        for (index, character) in zip(self.indices, self) {
             if character == "(" {
                 if ravDepth == 0 {
                     stripped += self[startIndex ..< index]
@@ -567,7 +567,7 @@ private extension String {
             #endif
         }
         let tokens = stripped._split(by: [" ", "."])
-        let moves = tokens.filter({ $0.characters.first?.isDigit == false })
+        let moves = tokens.filter({ $0.first?.isDigit == false })
         let outcome = tokens.last.flatMap(Game.Outcome.init)
         return (moves, outcome)
     }
@@ -580,7 +580,7 @@ private extension String {
         var afterEscape = false
         var inString = false
         var inComment = false
-        for (index, character) in zip(characters.indices, characters) {
+        for (index, character) in zip(self.indices, self) {
             if character == "\\" {
                 afterEscape = true
                 continue

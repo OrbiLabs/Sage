@@ -376,7 +376,7 @@ public struct Board: Hashable, CustomStringConvertible {
     public init?(fen: String) {
         func pieces(for string: String) -> [Piece?]? {
             var pieces: [Piece?] = []
-            for char in string.characters {
+            for char in string {
                 guard pieces.count < 8 else {
                     return nil
                 }
@@ -395,11 +395,11 @@ public struct Board: Hashable, CustomStringConvertible {
             }
             return pieces
         }
-        guard !fen.characters.contains(" ") else {
+        guard !fen.contains(" ") else {
             return nil
         }
         #if swift(>=3)
-            let parts = fen.characters.split(separator: "/").map(String.init)
+            let parts = fen.split(separator: "/").map(String.init)
             let ranks = Rank.all.reversed()
         #else
             let parts = fen.characters.split("/").map(String.init)
@@ -787,38 +787,59 @@ extension Board: SequenceType {
 
 #if os(OSX) || os(iOS) || os(tvOS)
 
-extension Board: CustomPlaygroundQuickLookable {
+extension Board: CustomPlaygroundDisplayConvertible {
+	
+	public var playgroundDescription: Any {
+		//return "Chess Board Playground"
+		
+		let spaceSize: CGFloat = 80
+		let boardSize = spaceSize * 8
+		let frame = CGRect(x: 0, y: 0, width: boardSize, height: boardSize)
+		let view = _View(frame: frame)
+		#if swift(>=3)
+		for space in self {
+			view.addSubview(space._view(size: spaceSize))
+		}
+		return view
+		#else
+		for space in self {
+		view.addSubview(space._view(spaceSize))
+		}
+		return .View(view)
+		#endif
+	}
+	
 
-    /// Returns the `PlaygroundQuickLook` for `self`.
-    private var _customPlaygroundQuickLook: PlaygroundQuickLook {
-        let spaceSize: CGFloat = 80
-        let boardSize = spaceSize * 8
-        let frame = CGRect(x: 0, y: 0, width: boardSize, height: boardSize)
-        let view = _View(frame: frame)
-        #if swift(>=3)
-            for space in self {
-                view.addSubview(space._view(size: spaceSize))
-            }
-            return .view(view)
-        #else
-            for space in self {
-                view.addSubview(space._view(spaceSize))
-            }
-            return .View(view)
-        #endif
-    }
+//    /// Returns the `PlaygroundQuickLook` for `self`.
+//    private var _customPlaygroundQuickLook: PlaygroundQuickLook {
+//        let spaceSize: CGFloat = 80
+//        let boardSize = spaceSize * 8
+//        let frame = CGRect(x: 0, y: 0, width: boardSize, height: boardSize)
+//        let view = _View(frame: frame)
+//        #if swift(>=3)
+//            for space in self {
+//                view.addSubview(space._view(size: spaceSize))
+//            }
+//            return .view(view)
+//        #else
+//            for space in self {
+//                view.addSubview(space._view(spaceSize))
+//            }
+//            return .View(view)
+//        #endif
+//    }
 
-    #if swift(>=3)
-    /// A custom playground quick look for this instance.
-    public var customPlaygroundQuickLook: PlaygroundQuickLook {
-        return _customPlaygroundQuickLook
-    }
-    #else
-    /// Returns the `PlaygroundQuickLook` for `self`.
-    public func customPlaygroundQuickLook() -> PlaygroundQuickLook {
-        return _customPlaygroundQuickLook
-    }
-    #endif
+//    #if swift(>=3)
+//    /// A custom playground quick look for this instance.
+//    public var customPlaygroundQuickLook: PlaygroundQuickLook {
+//        return _customPlaygroundQuickLook
+//    }
+//    #else
+//    /// Returns the `PlaygroundQuickLook` for `self`.
+//    public func customPlaygroundQuickLook() -> PlaygroundQuickLook {
+//        return _customPlaygroundQuickLook
+//    }
+//    #endif
 
 }
 
