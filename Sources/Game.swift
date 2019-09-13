@@ -166,33 +166,20 @@ public final class Game {
         /// - seealso: [FEN (Wikipedia)](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation),
         ///            [FEN (Chess Programming Wiki)](https://chessprogramming.wikispaces.com/Forsyth-Edwards+Notation)
         public init?(fen: String) {
-            #if swift(>=3)
-                let parts = fen.split(separator: " ").map(String.init)
-                guard
-                    parts.count == 6,
-                    let board = Board(fen: parts[0]),
-                    parts[1].count == 1,
-                    let playerTurn = parts[1].first.flatMap(Color.init),
-                    let rights = CastlingRights(string: parts[2]),
-                    let halfmoves = UInt(parts[4]),
-                    let fullmoves = UInt(parts[5]),
-                    fullmoves > 0 else {
-                        return nil
-                }
-            #else
-                let parts = fen.characters.split(" ").map(String.init)
-                guard
-                    parts.count == 6,
-                    let board = Board(fen: parts[0])
-                    where parts[1].characters.count == 1,
-                    let playerTurn = parts[1].characters.first.flatMap(Color.init),
-                    let rights = CastlingRights(string: parts[2]),
-                    let halfmoves = UInt(parts[4]),
-                    let fullmoves = UInt(parts[5])
-                    where fullmoves > 0 else {
-                        return nil
-                }
-            #endif
+		
+			let parts = fen.split(separator: " ").map(String.init)
+			guard
+				parts.count == 6,
+				let board = Board(fen: parts[0]),
+				parts[1].count == 1,
+				let playerTurn = parts[1].first.flatMap(Color.init),
+				let rights = CastlingRights(string: parts[2]),
+				let halfmoves = UInt(parts[4]),
+				let fullmoves = UInt(parts[5]),
+				fullmoves > 0 else {
+					return nil
+			}
+
             var target: Square? = nil
             let targetStr = parts[3]
             let targetChars = targetStr
@@ -446,7 +433,7 @@ public final class Game {
     public let variant: Variant
 
     /// Attackers to the current player's king.
-    private private(set) var attackersToKing: Bitboard
+	private var attackersToKing: Bitboard
 
     /// The current player's king is in check.
     public var kingIsChecked: Bool {
@@ -715,8 +702,6 @@ public final class Game {
         return movesForPiece(at: Square(location: location))
     }
 
-    #if swift(>=3)
-
     /// Returns `true` if the move is legal.
     public func isLegal(move: Move) -> Bool {
         let moves = movesBitboardForPiece(at: move.start)
@@ -814,107 +799,6 @@ public final class Game {
         _undoHistory = []
     }
 
-    #else
-
-    /// Returns `true` if the move is legal.
-    public func isLegal(move move: Move) -> Bool {
-        let moves = movesBitboardForPiece(at: move.start)
-        return Bitboard(square: move.end).intersects(moves)
-    }
-
-    @inline(__always)
-    private func _execute(uncheckedMove move: Move, @noescape promotion: () -> Piece.Kind) throws {
-        guard let piece = board[move.start] else {
-            throw ExecutionError.MissingPiece(move.start)
-        }
-        var endPiece = piece
-        var capture = board[move.end]
-        var captureSquare = move.end
-        let rights = castlingRights
-        if piece.kind.isPawn {
-            if move.end.rank == Rank(endFor: playerTurn) {
-                let promotion = promotion()
-                guard promotion.canPromote() else {
-                    throw ExecutionError.InvalidPromotion(promotion)
-                }
-                endPiece = Piece(kind: promotion, color: playerTurn)
-            } else if move.end == enPassantTarget {
-                capture = Piece(pawn: playerTurn.inverse())
-                captureSquare = Square(file: move.end.file, rank: move.start.rank)
-            }
-        } else if piece.kind.isRook {
-            switch move.start {
-            case .A1: castlingRights.remove(.WhiteQueenside)
-            case .H1: castlingRights.remove(.WhiteKingside)
-            case .A8: castlingRights.remove(.BlackQueenside)
-            case .H8: castlingRights.remove(.BlackKingside)
-            default:
-                break
-            }
-        } else if piece.kind.isKing {
-            for option in castlingRights where option.color == playerTurn {
-                castlingRights.remove(option)
-            }
-            if move.isCastle(for: playerTurn) {
-                let (old, new) = move._castleSquares()
-                let rook = Piece(rook: playerTurn)
-                board[rook][old] = false
-                board[rook][new] = true
-            }
-        }
-
-        if let capture = capture where capture.kind.isRook {
-            switch move.end {
-            case .A1 where playerTurn.isBlack: castlingRights.remove(.WhiteQueenside)
-            case .H1 where playerTurn.isBlack: castlingRights.remove(.WhiteKingside)
-            case .A8 where playerTurn.isWhite: castlingRights.remove(.BlackQueenside)
-            case .H8 where playerTurn.isWhite: castlingRights.remove(.BlackKingside)
-            default:
-                break
-            }
-        }
-
-        _moveHistory.append((move, piece, capture, enPassantTarget, attackersToKing, halfmoves, rights))
-        if let capture = capture {
-            board[capture][captureSquare] = false
-        }
-        if capture == nil && !piece.kind.isPawn {
-            halfmoves += 1
-        } else {
-            halfmoves = 0
-        }
-        board[piece][move.start] = false
-        board[endPiece][move.end] = true
-        playerTurn.invert()
-    }
-
-    /// Executes `move` without checking its legality, updating the state for `self`.
-    ///
-    /// - warning: Can cause unwanted effects. Should only be used with moves that are known to be legal.
-    ///
-    /// - parameter move: The move to be executed.
-    /// - parameter promotion: A closure returning a promotion piece kind if a pawn promotion occurs.
-    ///
-    /// - throws: `ExecutionError` if no piece exists at `move.start` or if `promotion` is invalid.
-    public func execute(uncheckedMove move: Move, @noescape promotion: () -> Piece.Kind) throws {
-        try _execute(uncheckedMove: move, promotion: promotion)
-        let piece = board[move.end]!
-        if piece.kind.isPawn && abs(move.rankChange) == 2 {
-            enPassantTarget = Square(file: move.start.file, rank: piece.color.isWhite ? 3 : 6)
-        } else {
-            enPassantTarget = nil
-        }
-        if kingIsChecked {
-            attackersToKing = 0
-        } else {
-            attackersToKing = board.attackersToKing(for: playerTurn)
-        }
-        fullmoves = 1 + (UInt(moveCount) / 2)
-        _undoHistory = []
-    }
-
-    #endif
-
     /// Executes `move` without checking its legality, updating the state for `self`.
     ///
     /// - warning: Can cause unwanted effects. Should only be used with moves that are known to be legal.
@@ -937,8 +821,6 @@ public final class Game {
     public func execute(uncheckedMove move: Move) throws {
         try execute(uncheckedMove: move, promotion: ._queen)
     }
-
-    #if swift(>=3)
 
     /// Executes `move`, updating the state for `self`.
     ///
@@ -971,42 +853,6 @@ public final class Game {
     public func execute(move: Move) throws {
         try execute(move: move, promotion: ._queen)
     }
-
-    #else
-
-    /// Executes `move`, updating the state for `self`.
-    ///
-    /// - parameter move: The move to be executed.
-    /// - parameter promotion: A closure returning a promotion piece kind if a pawn promotion occurs.
-    ///
-    /// - throws: `ExecutionError` if `move` is illegal or if `promotion` is invalid.
-    public func execute(move move: Move, @noescape promotion: () -> Piece.Kind) throws {
-        guard isLegal(move: move) else {
-            throw ExecutionError.IllegalMove(move, playerTurn, board)
-        }
-        try execute(uncheckedMove: move, promotion: promotion)
-    }
-
-    /// Executes `move`, updating the state for `self`.
-    ///
-    /// - parameter move: The move to be executed.
-    /// - parameter promotion: A piece kind for a pawn promotion.
-    ///
-    /// - throws: `ExecutionError` if `move` is illegal or if `promotion` is invalid.
-    public func execute(move move: Move, promotion: Piece.Kind) throws {
-        try execute(move: move, promotion: { promotion })
-    }
-
-    /// Executes `move`, updating the state for `self`.
-    ///
-    /// - parameter move: The move to be executed.
-    ///
-    /// - throws: `ExecutionError` if `move` is illegal.
-    public func execute(move move: Move) throws {
-        try execute(move: move, promotion: ._queen)
-    }
-
-    #endif
 
     /// Returns the last move on the move stack, if any.
     public func moveToUndo() -> Move? {

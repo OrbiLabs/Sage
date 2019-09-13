@@ -741,8 +741,6 @@ public struct Board: Hashable, CustomStringConvertible {
 
 }
 
-#if swift(>=3)
-
 extension Board: Sequence {
 
     /// A value less than or equal to the number of elements in
@@ -759,31 +757,6 @@ extension Board: Sequence {
     }
 
 }
-
-#else
-
-extension Board: SequenceType {
-
-    /// Returns a value less than or equal to the number of elements in
-    /// `self`, **nondestructively**.
-    ///
-    /// - Complexity: O(1).
-    @warn_unused_result
-    public func underestimateCount() -> Int {
-        return 64
-    }
-
-    /// Returns a generator over the spaces of the board.
-    ///
-    /// - complexity: O(1).
-    @warn_unused_result
-    public func generate() -> Generator {
-        return Generator(self)
-    }
-
-}
-
-#endif
 
 #if os(OSX) || os(iOS) || os(tvOS)
 
