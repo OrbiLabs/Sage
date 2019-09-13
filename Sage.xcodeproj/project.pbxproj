@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04E263A5232BEBDB00D2B6C5 /* Sage.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 04E263A4232BEBDB00D2B6C5 /* Sage.podspec */; };
 		521AF8EF1D5949FB009941A0 /* Tables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521AF8EE1D5949FB009941A0 /* Tables.swift */; };
 		521AF8F01D5949FB009941A0 /* Tables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521AF8EE1D5949FB009941A0 /* Tables.swift */; };
 		521AF8F11D5949FB009941A0 /* Tables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521AF8EE1D5949FB009941A0 /* Tables.swift */; };
@@ -104,6 +105,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		04E263A4232BEBDB00D2B6C5 /* Sage.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sage.podspec; sourceTree = "<group>"; };
 		521AF8EE1D5949FB009941A0 /* Tables.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tables.swift; sourceTree = "<group>"; };
 		5235BDA21D3A89A200B42FFD /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		524583A51D0DE7B9002311F3 /* Sage OSX Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Sage OSX Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -205,6 +207,7 @@
 		5273A7341CF2645900426C1F = {
 			isa = PBXGroup;
 			children = (
+				04E263A4232BEBDB00D2B6C5 /* Sage.podspec */,
 				5273A7701CF264B500426C1F /* Sources */,
 				524583A01D0DE791002311F3 /* Tests */,
 				5273A7711CF264B500426C1F /* Support */,
@@ -499,6 +502,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04E263A5232BEBDB00D2B6C5 /* Sage.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -350,11 +350,8 @@ public struct Board: Hashable, CustomStringConvertible {
     ///
     /// - parameter variant: The variant to populate the board for. Won't populate if `nil`. Default is `Standard`.
     public init(variant: Variant? = ._standard) {
-        #if swift(>=3)
-            _bitboards = Array(repeating: 0, count: 12)
-        #else
-            _bitboards = Array(count: 12, repeatedValue: 0)
-        #endif
+        _bitboards = Array(repeating: 0, count: 12)
+		
         if let variant = variant {
             for piece in Piece.all {
                 _bitboards[piece.hashValue] = Bitboard(startFor: piece)
@@ -384,11 +381,9 @@ public struct Board: Hashable, CustomStringConvertible {
                     pieces.append(piece)
                 } else if let num = Int(String(char)) {
                     guard 1...8 ~= num else { return nil }
-                    #if swift(>=3)
-                        pieces += Array(repeating: nil, count: num)
-                    #else
-                        pieces += Array(count: num, repeatedValue: nil)
-                    #endif
+					
+					pieces += Array(repeating: nil, count: num)
+					
                 } else {
                     return nil
                 }
@@ -398,13 +393,10 @@ public struct Board: Hashable, CustomStringConvertible {
         guard !fen.contains(" ") else {
             return nil
         }
-        #if swift(>=3)
-            let parts = fen.split(separator: "/").map(String.init)
-            let ranks = Rank.all.reversed()
-        #else
-            let parts = fen.characters.split("/").map(String.init)
-            let ranks = Rank.all.reverse()
-        #endif
+        
+		let parts = fen.split(separator: "/").map(String.init)
+		let ranks = Rank.all.reversed()
+		
         guard parts.count == 8 else {
             return nil
         }
