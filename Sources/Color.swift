@@ -19,6 +19,15 @@
 
 /// A chess color.
 public enum Color: String, CustomStringConvertible {
+	
+	public var hashValue: Int {
+		switch self {
+		case .white:
+			return 0
+		case .black:
+			return 1
+		}
+	}
 
     #if swift(>=3)
 

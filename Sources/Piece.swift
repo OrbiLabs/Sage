@@ -22,6 +22,10 @@ public struct Piece: Hashable, CustomStringConvertible {
 
     /// A piece kind.
     public enum Kind: Int {
+		
+		public var hashValue: Int {
+			return rawValue
+		}
 
         #if swift(>=3)
 
